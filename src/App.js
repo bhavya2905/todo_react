@@ -5,9 +5,11 @@ import TaskForm from './TaskForm';
 
 function App() {
   const [tasks,setTasks] =useState([]);
+  const [lastFlag,setLastFlag] =useState(false);
 
   useEffect(()=>{
-    if(tasks.length===0) return;
+    if(tasks.length===0 && !lastFlag) return;
+
     localStorage.setItem('tasks',JSON.stringify(tasks));
   },[tasks]);
 
@@ -17,12 +19,18 @@ function App() {
   },[]);
 
   function addTask(name){
-    setTasks(prev=>{
+    if(name.trim() === '') {alert("Enter the task"); return;}
+    setTasks(prev => {
       return [...prev, {name:name,done:false}];
-    })
+    });
   }
+
   function removeTask(tId){
+    if(tasks.length ===1) {
+      setLastFlag(true);
+    }
     setTasks(prev=>{
+      
       return prev.filter((tobj,id)=> id!==tId);
     })
   }
@@ -34,8 +42,8 @@ function App() {
     });
   }
 
-  const numComp = tasks.filter(t => t.done).length;
-  const numTot= tasks.length;
+  const numComp = tasks?.filter(t => t.done)?.length;
+  const numTot= tasks?.length;
 
   const getMotivation = () => {
     const motivationalQuotes = [
@@ -67,6 +75,8 @@ function App() {
  
  
   function renameTasks(id,newName){
+    if(newName.trim() === '') {alert("Enter the task"); return;}
+
     setTasks(prev=>{
       const newTasks = [...prev];
       newTasks[id].name = newName;
@@ -78,11 +88,14 @@ function App() {
     <main>
     <h1>{numComp}/{numTot} Complete</h1>
     <h3>{getMotivation()}</h3>
-      {numTot != 0 && numComp == numTot && <h2>Nice job for today! 😍👌</h2>}
+      {numTot !== 0 && numComp === numTot && <h2>Nice job for today! 😍👌</h2>}
       <TaskForm onAdd={addTask} />
       {
-        tasks.map((task,id)=>(
-          <Task {...task} onRename = {newName => renameTasks(id,newName)} onTrash ={()=>removeTask(id)} onToggle={done => updateTaskDone(id,done)} />
+        tasks?.map((task,id)=>(
+          <Task {...task} 
+          onRename = {newName => renameTasks(id,newName)} 
+          onTrash ={()=>removeTask(id)} 
+          onToggle={done => updateTaskDone(id,done)} />
         ))
       }
     </main>
