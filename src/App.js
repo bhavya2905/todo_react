@@ -8,7 +8,8 @@ function App() {
   const [lastFlag,setLastFlag] =useState(false);
 
   useEffect(()=>{
-    if(tasks?.length===0 && !lastFlag) return;
+    if(localStorage.getItem('tasks') !== null)
+      if(tasks.length===0 && !lastFlag) return;
 
     localStorage.setItem('tasks',JSON.stringify(tasks));
   },[tasks]);
